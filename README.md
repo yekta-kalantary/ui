@@ -141,7 +141,7 @@ Form components can resolve Laravel's default validation error bag by field name
 />
 ```
 
-If `errors()->first('email')` has a value, the component displays the error and suppresses the hint.
+If `$errors->first('email')` has a value, the component displays the error and suppresses the hint.
 
 An explicit error can also be passed:
 
