@@ -1,39 +1,42 @@
 # UI
 
-Reusable Blade UI components for Laravel applications.
+Reusable Blade UI primitives for Laravel applications.
 
-`yekta-kalantary/ui` is the base presentation package. It contains generic Blade components and Tailwind CSS helpers only. It has no Livewire dependency and no application or domain logic.
+`yekta-kalantary/ui` is the base presentation package for shared UI. It contains generic Blade components, package translations, and a small Tailwind CSS layer. It intentionally has no Livewire dependency and no application/domain logic.
 
 - Packagist: https://packagist.org/packages/yekta-kalantary/ui
 - Source: https://github.com/yekta-kalantary/ui
+- Issues: https://github.com/yekta-kalantary/ui/issues
 
 ## Requirements
 
 - PHP 8.3+
 - Laravel 13
-- Tailwind CSS 4 when using the bundled styles
+- Tailwind CSS 4 when using the bundled styling
 
 ## Installation
 
-The package is available on Packagist. No custom Composer repository is required.
+The package is available through Packagist, so no custom Composer repository is required.
 
-Until the first stable release tag is published, install the development branch explicitly:
+Until the first stable tag is published, install the development branch explicitly:
 
 ```bash
 composer require yekta-kalantary/ui:dev-main
 ```
 
-Laravel package discovery registers `Yekta\Ui\UiServiceProvider` automatically.
+The `main` branch is aliased to `1.0.x-dev` for Composer version resolution.
 
-After a stable release is tagged, the version suffix can be omitted:
+After a stable `1.x` release is tagged, installation becomes:
 
 ```bash
 composer require yekta-kalantary/ui
 ```
 
-## Tailwind CSS 4
+Laravel package discovery registers `Yekta\Ui\UiServiceProvider` automatically.
 
-The package ships Blade markup and a small Tailwind stylesheet. Add the package views to Tailwind's source scan and import the stylesheet from your application's `resources/css/app.css`:
+## Tailwind CSS 4 setup
+
+Add the package stylesheet and Blade sources to the consuming application's main stylesheet, usually `resources/css/app.css`:
 
 ```css
 @import 'tailwindcss';
@@ -42,203 +45,232 @@ The package ships Blade markup and a small Tailwind stylesheet. Add the package 
 @source '../../vendor/yekta-kalantary/ui/resources/views/**/*.blade.php';
 ```
 
-Adjust the relative paths if your main stylesheet is located elsewhere.
+The `@source` directive is required because most component classes live directly inside package Blade views. Without it, Tailwind may omit those classes from the generated CSS.
 
-The package intentionally does not enforce a font, text direction, locale, or application theme. Those remain responsibilities of the consuming application.
+The package does not force:
 
-## Components
+- a font family
+- RTL or LTR direction
+- application locale
+- application color tokens
+- JavaScript framework
+- Livewire
 
-All Blade components use the `ui` namespace.
+Those remain application concerns.
 
-### Button
+See [Styling and Tailwind](docs/styling.md) for the complete integration notes.
 
-```blade
-<x-ui::button type="submit">
-    ذخیره
-</x-ui::button>
-```
-
-### Input
-
-```blade
-<x-ui::input
-    name="first_name"
-    label="نام"
-    required
-/>
-```
-
-Laravel validation errors are resolved automatically when a field has a `name`. An explicit error can also be passed when needed.
-
-### Textarea
-
-```blade
-<x-ui::textarea
-    name="description"
-    label="توضیحات"
-/>
-```
-
-### Select
-
-```blade
-<x-ui::select name="status" label="وضعیت">
-    <option value="active">فعال</option>
-    <option value="inactive">غیرفعال</option>
-</x-ui::select>
-```
-
-### Checkbox
-
-```blade
-<x-ui::checkbox
-    name="enabled"
-    label="فعال"
-    :checked="true"
-/>
-```
-
-### Card
+## Quick start
 
 ```blade
 <x-ui::card>
-    محتوا
+    <x-slot:header>
+        اطلاعات مخاطب
+    </x-slot:header>
+
+    <div class="space-y-4">
+        <x-ui::input
+            name="first_name"
+            label="نام"
+            required
+        />
+
+        <x-ui::input
+            name="mobile"
+            label="موبایل"
+            required
+        />
+
+        <x-ui::textarea
+            name="description"
+            label="توضیحات"
+        />
+
+        <div class="flex justify-end">
+            <x-ui::button type="submit">
+                ذخیره
+            </x-ui::button>
+        </div>
+    </div>
 </x-ui::card>
 ```
 
-### Badge
+## Components
 
-```blade
-<x-ui::badge variant="success">
-    فعال
-</x-ui::badge>
-```
+The package currently ships these Blade components:
 
-### Alert
+| Component | Purpose |
+| --- | --- |
+| `<x-ui::button>` | Buttons with variant, size, disabled state and attribute forwarding |
+| `<x-ui::input>` | Text-like inputs with label, value, hint and validation error presentation |
+| `<x-ui::textarea>` | Multiline input with label, rows, hint and validation error presentation |
+| `<x-ui::select>` | Native select wrapper with label, hint and validation error presentation |
+| `<x-ui::checkbox>` | Checkbox with label, checked state and validation error presentation |
+| `<x-ui::card>` | Container with optional header and footer slots |
+| `<x-ui::alert>` | Alert message with semantic visual variants |
+| `<x-ui::badge>` | Compact status badge with visual variants |
+| `<x-ui::table>` | Responsive table shell and shared table classes |
+| `<x-ui::empty-state>` | Empty-state message with localization, description and action slot |
 
-```blade
-<x-ui::alert variant="danger">
-    خطایی رخ داده است.
-</x-ui::alert>
-```
+For every prop, default, variant, slot and example, see [Component reference](docs/components.md).
 
-### Table
+## Attribute forwarding
 
-```blade
-<x-ui::table>
-    <thead>
-        <tr>
-            <th>نام</th>
-            <th>موبایل</th>
-        </tr>
-    </thead>
-    <tbody>
-        ...
-    </tbody>
-</x-ui::table>
-```
-
-### Empty state
-
-```blade
-<x-ui::empty-state
-    title="موردی یافت نشد"
-    description="برای شروع یک مورد جدید ایجاد کنید."
-/>
-```
-
-## HTML, Alpine and Livewire attributes
-
-Components forward unknown HTML attributes. This keeps the base package independent while allowing a consuming application to attach Alpine or Livewire behavior when needed.
+Unknown attributes are forwarded to the underlying element wherever possible. This allows the base package to remain independent while consumers attach framework behavior themselves.
 
 ```blade
 <x-ui::input
+    name="search"
     wire:model.live="search"
     x-on:focus="open = true"
+    data-testid="search-input"
 />
 ```
 
-The `ui` package itself does not depend on Alpine or Livewire.
+`ui` does not need Livewire or Alpine to support these attributes.
+
+## Validation errors
+
+Form components can resolve Laravel's default validation error bag by field name:
+
+```blade
+<x-ui::input
+    name="email"
+    label="ایمیل"
+    hint="ایمیل کاری را وارد کنید."
+/>
+```
+
+If `errors()->first('email')` has a value, the component displays the error and suppresses the hint.
+
+An explicit error can also be passed:
+
+```blade
+<x-ui::input
+    name="email"
+    label="ایمیل"
+    error="این ایمیل قابل استفاده نیست."
+/>
+```
 
 ## Localization
 
-The package currently includes English and Persian translation resources. Laravel's active locale determines which translation is used.
+English and Persian translations are included. The active Laravel locale controls built-in package copy.
 
-Publish translations only when the application needs to override package copy:
+```php
+app()->setLocale('fa');
+```
+
+Publish translations only when an application needs to override them:
 
 ```bash
 php artisan vendor:publish --tag=ui-translations
 ```
 
-Published translations are written to:
+Published location:
 
 ```text
 lang/vendor/ui
 ```
 
-## Publishing views
+See [Localization](docs/localization.md) for details.
 
-Package views can be overridden by publishing them:
+## Publishing package resources
+
+Publishing is optional. Prefer package-owned resources until the application genuinely needs an override.
+
+### Views
 
 ```bash
 php artisan vendor:publish --tag=ui-views
 ```
 
-Published views are written to:
+Destination:
 
 ```text
 resources/views/vendor/ui
 ```
 
-Publishing views is optional. Prefer using the package views directly unless an application-specific override is necessary.
-
-## Publishing CSS
-
-Publish the stylesheet only when the application intentionally needs to own and modify a local copy:
+### CSS
 
 ```bash
 php artisan vendor:publish --tag=ui-css
 ```
 
-The published file is written to:
+Destination:
 
 ```text
 resources/css/vendor/ui.css
 ```
 
-## Architecture
+### Translations
 
-This package must stay generic and presentation-only.
+```bash
+php artisan vendor:publish --tag=ui-translations
+```
 
-The following belong here:
+Destination:
 
-- Blade primitives
-- visual states
-- validation presentation
-- reusable layout helpers
-- generic Tailwind styles
+```text
+lang/vendor/ui
+```
 
-The following do not belong here:
+## Package boundaries
+
+This package is intentionally presentation-only.
+
+Belongs in `ui`:
+
+- generic Blade primitives
+- generic visual states
+- reusable form presentation
+- generic layout containers
+- translation strings owned by those primitives
+- Tailwind helpers used by those primitives
+
+Does not belong in `ui`:
 
 - Eloquent models
 - database queries
-- application routes
-- authorization rules
-- business terminology such as contacts, clients or tickets
+- routes
+- authorization policies
+- permissions
+- business terms such as contacts, clients, tickets or projects
 - Livewire components
+- application-specific workflows
 
 Interactive Livewire components belong in `yekta-kalantary/ui-livewire`.
 
+See [Architecture and package development](docs/development.md).
+
 ## Development
 
-Install dependencies and run the test suite:
-
 ```bash
-composer install
+git clone https://github.com/yekta-kalantary/ui.git
+cd ui
+composer update
 composer test
 ```
 
-Current development dependencies target Laravel 13 through Orchestra Testbench 11.
+Validate package metadata separately with:
+
+```bash
+composer validate --strict
+```
+
+The CI matrix covers:
+
+- PHP 8.3
+- PHP 8.4
+- lowest supported dependency versions
+- highest matching dependency versions
+
+## Documentation
+
+- [Component reference](docs/components.md)
+- [Styling and Tailwind](docs/styling.md)
+- [Localization](docs/localization.md)
+- [Architecture, testing and development](docs/development.md)
 
 ## License
 
