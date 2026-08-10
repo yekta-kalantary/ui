@@ -4,6 +4,7 @@
     "description": "Reusable Blade UI components for Laravel applications.",
     "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/yekta-kalantary/ui",
     "keywords": [
         "laravel",
         "blade",
@@ -11,6 +12,10 @@
         "components",
         "tailwindcss"
     ],
+    "support": {
+        "issues": "https://github.com/yekta-kalantary/ui/issues",
+        "source": "https://github.com/yekta-kalantary/ui"
+    },
     "require": {
         "php": "^8.3",
         "illuminate/support": "^13.0",
